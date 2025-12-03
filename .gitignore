@@ -30,7 +30,5 @@ pnpm-debug.log*
 
 # Tauri
 src-tauri/gen/
-*.icns
-*.ico
 
 .copilot/
