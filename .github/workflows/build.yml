@@ -47,8 +47,6 @@ jobs:
           - platform: windows-latest
             target: x86_64-pc-windows-msvc
             name: windows-x64
-
-    runs-on: ${{ matrix.platform }}
     
     steps:
       - name: Checkout repository
