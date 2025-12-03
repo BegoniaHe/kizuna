@@ -451,8 +451,9 @@ const processChildrenForCursor = (children: React.ReactNode): { nodes: React.Rea
     }
 
     if (React.isValidElement(node)) {
+      const elementProps = node.props as { children?: React.ReactNode };
       return React.cloneElement(node, {
-        children: traverse(node.props.children) as React.ReactNode
+        children: traverse(elementProps.children) as React.ReactNode
       } as any);
     }
 
@@ -490,17 +491,23 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = memo(({
             const isInline = !match && !className;
             const language = match?.[1]?.toLowerCase();
             
+            // Cast children to React.ReactNode for type compatibility
+            const childrenNode = children as React.ReactNode;
+            
             // Handle cursor in code blocks
-            const { nodes: processedChildren, hasCursor } = processChildrenForCursor(children);
+            const { nodes: processedChildren, hasCursor } = processChildrenForCursor(childrenNode);
 
             // 提取代码文本
             const getCodeText = (node: React.ReactNode): string => {
               if (typeof node === 'string') return node;
               if (Array.isArray(node)) return node.map(getCodeText).join('');
-              if (React.isValidElement(node)) return getCodeText((node as React.ReactElement).props.children);
+              if (React.isValidElement(node)) {
+                const elementProps = (node as React.ReactElement).props as { children?: React.ReactNode };
+                return getCodeText(elementProps.children);
+              }
               return '';
             };
-            const codeText = getCodeText(children).replace('![cursor](cursor-marker)', '').trim();
+            const codeText = getCodeText(childrenNode).replace('![cursor](cursor-marker)', '').trim();
 
             // Mermaid 图表渲染
             if (language === 'mermaid') {
@@ -544,13 +551,16 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = memo(({
                     // But with highlighting, it's complex.
                     // Let's try to extract text from children recursively.
                     
-                    const getText = (node: any): string => {
+                    const getText = (node: React.ReactNode): string => {
                         if (typeof node === 'string') return node;
                         if (Array.isArray(node)) return node.map(getText).join('');
-                        if (React.isValidElement(node)) return getText((node as React.ReactElement).props.children);
+                        if (React.isValidElement(node)) {
+                          const elementProps = (node as React.ReactElement).props as { children?: React.ReactNode };
+                          return getText(elementProps.children);
+                        }
                         return '';
                     };
-                    const text = getText(children).replace('![cursor](cursor-marker)', '');
+                    const text = getText(childrenNode).replace('![cursor](cursor-marker)', '');
                     navigator.clipboard.writeText(text.replace(/\n$/, ""));
                   }}
                 >

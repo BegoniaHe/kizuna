@@ -252,30 +252,34 @@ export class Live2DRendererAdapter extends BaseModelRenderer {
   setScale(scale: number): void {
     if (this.model) {
       this.currentScale = scale;
-      this.model.scale.set(scale);
+      (this.model as any).scale.set(scale);
     }
   }
   
   setPosition(x: number, y: number): void {
     if (this.model) {
-      this.model.x = x;
-      this.model.y = y;
+      // Cast to any to access PixiJS display object properties
+      const modelAny = this.model as any;
+      modelAny.x = x;
+      modelAny.y = y;
     }
   }
   
   resetView(): void {
     if (!this.model || !this.container) return;
     
+    // Cast to any to access PixiJS display object properties
+    const modelAny = this.model as any;
     const scale = Math.min(
-      this.container.clientWidth / this.model.width,
-      this.container.clientHeight / this.model.height,
+      this.container.clientWidth / modelAny.width,
+      this.container.clientHeight / modelAny.height,
     ) * 0.8;
     
     this.currentScale = scale;
-    this.model.scale.set(scale);
-    this.model.x = this.container.clientWidth / 2;
-    this.model.y = this.container.clientHeight / 2;
-    this.model.anchor.set(0.5, 0.5);
+    modelAny.scale.set(scale);
+    modelAny.x = this.container.clientWidth / 2;
+    modelAny.y = this.container.clientHeight / 2;
+    modelAny.anchor.set(0.5, 0.5);
   }
 }
 

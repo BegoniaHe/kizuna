@@ -58,15 +58,17 @@ export const Live2DCanvas: React.FC<Live2DCanvasProps> = ({ modelPath }) => {
       console.log("[Live2DCanvas] Live2D model loaded:", model);
 
       // Scale and position the model
+      // Cast to any to access PixiJS display object properties
+      const modelAny = model as any;
       const scale = Math.min(
-        containerRef.current.clientWidth / model.width,
-        containerRef.current.clientHeight / model.height,
+        containerRef.current.clientWidth / modelAny.width,
+        containerRef.current.clientHeight / modelAny.height,
       ) * 0.8;
 
-      model.scale.set(scale);
-      model.x = containerRef.current.clientWidth / 2;
-      model.y = containerRef.current.clientHeight / 2;
-      model.anchor.set(0.5, 0.5);
+      modelAny.scale.set(scale);
+      modelAny.x = containerRef.current.clientWidth / 2;
+      modelAny.y = containerRef.current.clientHeight / 2;
+      modelAny.anchor.set(0.5, 0.5);
 
       // Add model to stage (cast to Container for compatibility)
       app.stage.addChild(model as unknown as Container);
